@@ -1,6 +1,7 @@
 ﻿
-using Asp.LinguagensWP.Models;
-using LinguagensWP.DataAccess;
+using LinguagensWP.Domain.LinguagemAggregate;
+using LinguagensWP.Infrastructure.DataAccess;
+using LinguagensWP.Infrastructure.DataAccess.Contexts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace LinguagensWP.Api.Controllers {
         }
 
         [HttpGet("getall")]
-        public async Task<ActionResult<IList<Linguagem>>> GetAll() {
+        public async Task<ActionResult<IEnumerable<Linguagem>>> GetAll() {
             var iqLinguagens = _context.Linguagens.Include(l => l.Autor);
             var test = await iqLinguagens.ToListAsync();
             return test;
