@@ -6,6 +6,10 @@ using LinguagemWP.WebApp.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Http;
+using LinguagensWP.WebApp.Services;
+using System;
+using System.Net.Http.Headers;
 
 namespace LinguagemWP.WebApp
 {
@@ -21,12 +25,22 @@ namespace LinguagemWP.WebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllersWithViews();
+            services.Configure<CookiePolicyOptions>(options => {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            services.AddHttpClient<IHttpClientService, HttpClientService>(x => {
+                x.BaseAddress = new Uri(Configuration["HttpClient:BaseAddress"]);
+                x.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Configuration["HttpClient:MediaType"]));
+            });
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySQL(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
             services.AddRazorPages();
         }
 
